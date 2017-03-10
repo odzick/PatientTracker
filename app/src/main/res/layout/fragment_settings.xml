@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="group12.cpen391.patienttracker.SettingsFragment">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="24dp">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bluetooth_button"
+            android:background="@color/windowBackground"
+            android:text="Pair with patient tracker"
+            android:padding="16dp"
+            android:layout_margin="8dp">
+        </Button>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/contacts_button"
+            android:background="@color/windowBackground"
+            android:text="Update patient contacts"
+            android:padding="16dp"
+            android:layout_margin="8dp">
+        </Button>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/patient_info_button"
+            android:background="@color/windowBackground"
+            android:text="Update patient information"
+            android:padding="16dp"
+            android:layout_margin="8dp">
+        </Button>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/change_photo_button"
+            android:background="@color/windowBackground"
+            android:text="Change patient photo"
+            android:padding="16dp"
+            android:layout_margin="8dp">
+        </Button>
+
+    </LinearLayout>
+</RelativeLayout>
