@@ -26,6 +26,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +55,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     private MapView mMapView;
     private Spinner mSpinner;
     private Button mRefreshLocationButton;
+
+    private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
 
 
     public MapFragment() {
@@ -111,8 +115,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spin
             mSpinner.setAdapter(adapter);
-
-
 
         }catch (InflateException e){
             Log.e("mapview", "Inflate exception");
@@ -196,14 +198,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         marker = mMap.addMarker(new MarkerOptions().position(ubc).title("UBC"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubc, 15));
         PolylineOptions polylineOptions = new PolylineOptions()
-                .add(new LatLng(49.2606, -123.2460))
-                .add(new LatLng(59.2606, -123.2460))// Point B.
                 .width(5)
                 .color(Color.parseColor("#125688"))
                 .geodesic(true);
 
+        populatePath();
+        addPathtoPolyline(polylineOptions);
         Polyline polyline = mMap.addPolyline(polylineOptions);
-
 
         marker.showInfoWindow();
     }
@@ -244,5 +245,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
     public void onNothingSelected(AdapterView<?> parent) {
         // Another interface callback
+    }
+
+    public void populatePath(){
+        //TODO populate with real server data
+        pathPoints.add(new LatLng(49.2606, -123.2460));
+        pathPoints.add(new LatLng(59.2606, -123.2460));
+    }
+
+    public void addPathtoPolyline(PolylineOptions p){
+        for(int i = 0; i < pathPoints.size(); i++){
+            p.add(pathPoints.get(i));
+        }
     }
 }
