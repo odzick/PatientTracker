@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,6 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+
+import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -80,9 +87,11 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
             rootView = inflater.inflate(R.layout.fragment_settings, container, false);
             mChangeInfoButton = (Button) rootView.findViewById(R.id.patient_info_button);
             mPairDeviceButton = (Button) rootView.findViewById(R.id.bluetooth_button);
+            mChangeContactButton = (Button) rootView.findViewById(R.id.contacts_button);
 
             mChangeInfoButton.setOnClickListener(this);
             mPairDeviceButton.setOnClickListener(this);
+            mChangeContactButton.setOnClickListener(this);
 
         } catch (InflateException e){
         Log.e("mapview", "Inflate exception");
@@ -128,11 +137,12 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     public void onClick(View v){
         switch(v.getId()){
             case(R.id.patient_info_button):
-                Intent intent = new Intent(this.getContext(), PatientInfoActivity.class);
-                startActivity(intent);
+                Intent infoIntent = new Intent(this.getContext(), PatientInfoActivity.class);
+                startActivity(infoIntent);
                 break;
             case(R.id.contacts_button):
-                //TODO go to contact picker
+                Intent contactsIntent = new Intent(this.getContext(), ContactsActivity.class);
+                startActivity(contactsIntent);
                 break;
             case(R.id.change_photo_button):
                 //TODO go to select/take photo dialog
