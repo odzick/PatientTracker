@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,10 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
     private EditText mC1Name;
     private EditText mC1Number;
     private EditText mC1Relation;
+    private String currentC1Name;
+    private String currentC1Number;
+    private String currentC1Relation;
+    private FloatingActionButton mConfirmButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,10 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
         mC1Relation = (EditText) findViewById(R.id.input_c1_relation);
         mC1Button = (Button) findViewById(R.id.edit_c1_but);
 
+        mConfirmButton = (FloatingActionButton) findViewById(R.id.confirm_contact_fab);
+
         mC1Button.setOnClickListener(this);
+        mConfirmButton.setOnClickListener(this);
     }
 
     @Override
@@ -51,43 +59,16 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
             case(R.id.edit_c1_but):
                 pickContact();
                 break;
-        }
-    }
-
-    private void getContacts(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-        } else {
-            Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-            while (cursor.moveToNext()) {
-                String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                if ("1".equals(hasPhone) || Boolean.parseBoolean(hasPhone)) {
-                    // You know it has a number so now query it like this
-                    Cursor phones = this.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + contactId, null, null);
-                    while (phones.moveToNext()) {
-                        String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        int itype = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
-
-                        final boolean isMobile =
-                                itype == ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE ||
-                                        itype == ContactsContract.CommonDataKinds.Phone.TYPE_WORK_MOBILE;
-
-                        // Do something here with 'phoneNumber' such as saving into
-                        // the List or Array that will be used in your 'ListView'.
-
-                    }
-                    phones.close();
-                }
-            }
+            case(R.id.confirm_contact_fab):
+                currentC1Name = mC1Name.getText().toString();
+                currentC1Number = mC1Number.getText().toString();
+                currentC1Relation = mC1Relation.getText().toString();
+                //TODO send via bluetooth
+                break;
         }
     }
 
     private void pickContact() {
-
-
         // Check the SDK version and whether the permission is already granted or not.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
@@ -97,11 +78,6 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
             Intent i= new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
             startActivityForResult(i, PICK_CONTACT_REQUEST);
         }
-        /* Intent phonebookIntent = new Intent("intent.action.INTERACTION_TOPMENU");
-        phonebookIntent.putExtra("additional", "phone-multi");
-        phonebookIntent.putExtra("maxRecipientCount", 4);
-        phonebookIntent.putExtra("FromMMS", true);
-        startActivityForResult(phonebookIntent, PICK_CONTACT_REQUEST);*/
     }
 
     @Override

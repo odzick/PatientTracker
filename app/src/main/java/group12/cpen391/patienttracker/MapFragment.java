@@ -20,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
 
 
 /**
@@ -51,10 +54,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
     private View rootView;
     private GoogleMap mMap;
-    private Marker marker;
+    private Marker patientMarker;
     private MapView mMapView;
     private Spinner mSpinner;
     private Button mRefreshLocationButton;
+    private LatLng mCurrentLatLng;
+    private Marker myMarker;
 
     private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
 
@@ -88,7 +93,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
@@ -115,6 +119,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spin
             mSpinner.setAdapter(adapter);
+
+            mCurrentLatLng = ((MainActivity) getActivity()).getLatLng();
 
         }catch (InflateException e){
             Log.e("mapview", "Inflate exception");
@@ -181,6 +187,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     @Override
     public void onResume() {
         super.onResume();
+        mCurrentLatLng = ((MainActivity) getActivity()).getLatLng();
+        if(mCurrentLatLng != null){
+            myMarker.setPosition(mCurrentLatLng);
+            myMarker.setVisible(true);
+        }
         mMapView.onResume();
     }
 
@@ -192,13 +203,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
         LatLng ubc = new LatLng(49.2606, -123.2460);
-        marker = mMap.addMarker(new MarkerOptions().position(ubc).title("UBC"));
+
+        if(mCurrentLatLng != null) {
+            myMarker = mMap.addMarker(new MarkerOptions().position(mCurrentLatLng).title("You")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+        } else {
+            myMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("You")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    .visible(false));
+        }
+
+        patientMarker = mMap.addMarker(new MarkerOptions().position(ubc).title("Patient"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubc, 15));
         PolylineOptions polylineOptions = new PolylineOptions()
-                .width(5)
+                .width(10)
                 .color(Color.parseColor("#125688"))
                 .geodesic(true);
 
@@ -206,7 +225,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         addPathtoPolyline(polylineOptions);
         Polyline polyline = mMap.addPolyline(polylineOptions);
 
-        marker.showInfoWindow();
+        patientMarker.showInfoWindow();
     }
 
     @Override
@@ -240,7 +259,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                 break;
         }
-
     }
 
     public void onNothingSelected(AdapterView<?> parent) {

@@ -78,6 +78,7 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                 currentAddress = mEditAddress.toString();
                 currentCity = mEditCity.toString();
                 currentPostalCode = mEditPostalCode.toString();
+                String cityLine = currentCity + ", " + currentProvince + ", " + currentPostalCode;
                 //TODO error toasters for blank entries
                 // (limited input types and size in xml already)
                 //TODO Send to De1 then exit activity

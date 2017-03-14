@@ -94,7 +94,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
             mChangeContactButton.setOnClickListener(this);
 
         } catch (InflateException e){
-        Log.e("mapview", "Inflate exception");
+        Log.e("settingsview", "Inflate exception");
         }
 
         return rootView;
