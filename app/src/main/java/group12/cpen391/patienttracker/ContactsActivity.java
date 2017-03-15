@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
     static final int PICK_CONTACT_REQUEST = 1;
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
 
-    private Button mC1Button;
+    private ImageButton mC1Button;
     private EditText mC1Name;
     private EditText mC1Number;
     private EditText mC1Relation;
@@ -45,7 +46,7 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
         mC1Name = (EditText) findViewById(R.id.input_c1_name);
         mC1Number = (EditText) findViewById(R.id.input_c1_number);
         mC1Relation = (EditText) findViewById(R.id.input_c1_relation);
-        mC1Button = (Button) findViewById(R.id.edit_c1_but);
+        mC1Button = (ImageButton) findViewById(R.id.edit_c1_but);
 
         mConfirmButton = (FloatingActionButton) findViewById(R.id.confirm_contact_fab);
 

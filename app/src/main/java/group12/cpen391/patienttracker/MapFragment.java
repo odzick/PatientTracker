@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,7 +58,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     private Marker patientMarker;
     private MapView mMapView;
     private Spinner mSpinner;
-    private Button mRefreshLocationButton;
+    private ImageButton mRefreshLocationButton;
     private LatLng mCurrentLatLng;
     private Marker myMarker;
 
@@ -109,7 +110,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             mSpinner = (Spinner) rootView.findViewById(R.id.map_type_spinner);
             mSpinner.setOnItemSelectedListener(this);
 
-            mRefreshLocationButton = (Button) rootView.findViewById(R.id.location_button);
+            mRefreshLocationButton = (ImageButton) rootView.findViewById(R.id.location_button);
             mRefreshLocationButton.setOnClickListener(this);
 
             // Create an ArrayAdapter using the string array and a default spinner layout

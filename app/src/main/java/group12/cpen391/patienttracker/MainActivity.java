@@ -3,6 +3,7 @@ import android.*;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.nfc.Tag;
 import android.os.Build;
@@ -26,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,9 +56,9 @@ public class MainActivity extends AppCompatActivity implements
 
     TabLayout tabLayout;
     private int[] tabIcons = {
-            android.R.drawable.ic_dialog_map,
-            android.R.drawable.ic_menu_gallery,
-            android.R.drawable.ic_menu_upload
+            R.drawable.ic_map,
+            R.drawable.ic_gallery,
+            R.drawable.ic_settings
     };
 
     /**
@@ -95,9 +97,22 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setupTabIcons() {
-        tabLayout.getTabAt(0).setIcon(tabIcons[0]);
+        View view1 = getLayoutInflater().inflate(R.layout.customtab, null);
+        view1.findViewById(R.id.icon).setBackgroundResource(tabIcons[0]);
+        tabLayout.getTabAt(0).setCustomView(view1);
+
+        View view2 = getLayoutInflater().inflate(R.layout.customtab, null);
+        view2.findViewById(R.id.icon).setBackgroundResource(tabIcons[1]);
+        tabLayout.getTabAt(1).setCustomView(view2);
+
+        View view3 = getLayoutInflater().inflate(R.layout.customtab, null);
+        view3.findViewById(R.id.icon).setBackgroundResource(tabIcons[2]);
+        tabLayout.getTabAt(2).setCustomView(view3);
+
+
+        /*tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        tabLayout.getTabAt(2).setIcon(tabIcons[2]);
+        tabLayout.getTabAt(2).setIcon(tabIcons[2]);*/
     }
 
     protected void onStart() {

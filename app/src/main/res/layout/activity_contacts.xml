@@ -31,8 +31,8 @@
                 android:text="Contact 1"
                 style="?android:attr/listSeparatorTextViewStyle" />
 
-            <Button
-                android:text="Edit"
+            <ImageButton
+                app:srcCompat="@drawable/ic_add_contact"
                 android:layout_width="60dp"
                 android:layout_height="40dp"
                 android:id="@+id/edit_c1_but" />
@@ -89,7 +89,6 @@
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
-
 
     </LinearLayout>
 
