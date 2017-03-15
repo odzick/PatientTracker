@@ -108,11 +108,6 @@ public class MainActivity extends AppCompatActivity implements
         View view3 = getLayoutInflater().inflate(R.layout.customtab, null);
         view3.findViewById(R.id.icon).setBackgroundResource(tabIcons[2]);
         tabLayout.getTabAt(2).setCustomView(view3);
-
-
-        /*tabLayout.getTabAt(0).setIcon(tabIcons[0]);
-        tabLayout.getTabAt(1).setIcon(tabIcons[1]);
-        tabLayout.getTabAt(2).setIcon(tabIcons[2]);*/
     }
 
     protected void onStart() {
