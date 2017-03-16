@@ -3,6 +3,7 @@ package group12.cpen391.patienttracker;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 
@@ -28,9 +28,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import static android.content.ContentValues.TAG;
+import static group12.cpen391.patienttracker.serverMessageParsing.Translator.parseGPS;
 
 
 /**
@@ -61,6 +66,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     private ImageButton mRefreshLocationButton;
     private LatLng mCurrentLatLng;
     private Marker myMarker;
+    private Polyline polyline;
 
     private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
 
@@ -222,9 +228,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 .color(Color.parseColor("#125688"))
                 .geodesic(true);
 
-        populatePath();
-        addPathtoPolyline(polylineOptions);
-        Polyline polyline = mMap.addPolyline(polylineOptions);
+        //populatePath();
+        //addPathtoPolyline(polylineOptions);
+        polyline = mMap.addPolyline(polylineOptions);
+        polyline.setPoints(pathPoints);
+        if(!pathPoints.isEmpty()) {
+            patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
+        }
 
         patientMarker.showInfoWindow();
     }
@@ -233,7 +243,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     public void onClick(View v){
         switch(v.getId()){
             case(R.id.location_button):
-                //TODO refresh gps & redraw path on map
+                new ServerConnector().execute();
                 break;
         }
     }
@@ -275,6 +285,76 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     public void addPathtoPolyline(PolylineOptions p){
         for(int i = 0; i < pathPoints.size(); i++){
             p.add(pathPoints.get(i));
+        }
+    }
+
+    public class ServerConnector extends AsyncTask<Void, Void, Void> {
+
+        ArrayList<LatLng> path = new ArrayList<LatLng>();
+
+        protected void connect() {
+            String s  = "";
+            String hostName = "g12host.ddns.net";
+            int portNumber = 3307;
+
+
+            byte[] b = new byte[256];
+
+            try {
+
+                Socket echoSocket = new Socket(hostName, portNumber);
+
+                OutputStream outStream = echoSocket.getOutputStream();
+                InputStream inStream = echoSocket.getInputStream();
+
+                outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
+                inStream.read(b, 0, 256);
+
+                s = new String(b);
+                if(!s.contains("OK")){
+                    outStream.close();
+                    inStream.close();
+                    echoSocket.close();
+                    return;
+                }
+                outStream.write(("REG:GPS \n DEVICE:1").getBytes("US-ASCII"));
+
+
+                //byte array, offset, length
+
+                do {
+                    inStream.read(b, 0, 256);
+                    s += new String(b, "US-ASCII");
+                } while (inStream.available()!=0);
+
+                path = parseGPS(s);
+                outStream.close();
+                inStream.close();
+                echoSocket.close();
+            }
+
+            catch  (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        protected Void doInBackground(Void... params) {
+            connect();
+            return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(Void result) {
+            pathPoints = path;
+            polyline.setPoints(pathPoints);
+            patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
         }
     }
 }
