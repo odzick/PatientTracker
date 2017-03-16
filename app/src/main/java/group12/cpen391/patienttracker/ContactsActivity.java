@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -118,7 +121,6 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
                 break;
             case (R.id.confirm_contact_fab):
                 copyToSend();
-                //TODO send via bluetooth
                 this.finish();
                 break;
         }
@@ -164,6 +166,29 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
         currentC4Name = mC4Name.getText().toString();
         currentC4Number = mC4Number.getText().toString();
         currentC4Relation = mC4Relation.getText().toString();
+
+        JSONObject o = new JSONObject();
+        try {
+            o.put("nameC1", currentC1Name);
+            o.put("phoneC1", currentC1Number);
+            o.put("relationC1", currentC1Relation);
+
+            o.put("nameC2", currentC2Name);
+            o.put("phoneC2", currentC2Number);
+            o.put("relationC2", currentC2Relation);
+
+            o.put("nameC3", currentC3Name);
+            o.put("phoneC3", currentC3Number);
+            o.put("relationC3", currentC3Relation);
+
+            o.put("nameC4", currentC4Name);
+            o.put("phoneC4", currentC4Number);
+            o.put("relationC4", currentC4Relation);
+        } catch (JSONException e){ }
+
+        // Write json to DE1.
+        BluetoothService bt = BluetoothService.getService();
+        bt.write(o.toString());
     }
 
     @Override

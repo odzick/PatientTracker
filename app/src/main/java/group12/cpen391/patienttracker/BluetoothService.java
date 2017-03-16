@@ -62,7 +62,7 @@ public class BluetoothService {
             mConnectThread = new ConnectThread(mDevice);
             mConnectThread.start();
         } else {
-            // TODO: error
+
         }
     }
 

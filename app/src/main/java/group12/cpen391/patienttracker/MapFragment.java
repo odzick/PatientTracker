@@ -226,7 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 .width(10)
                 .color(Color.parseColor("#125688"))
                 .geodesic(true);
-        
+
         polyline = mMap.addPolyline(polylineOptions);
         polyline.setPoints(pathPoints);
         if(!pathPoints.isEmpty()) {
