@@ -119,6 +119,7 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
             case (R.id.confirm_contact_fab):
                 copyToSend();
                 //TODO send via bluetooth
+                this.finish();
                 break;
         }
     }
@@ -187,8 +188,8 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
 
                     String phoneNo = phones.getString(phones.getColumnIndex(
                             ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("[^0-9+]", "");
-                    
-                    //TODO normalize numbers
+
+                    //TODO normalize numbers (maybe not needed)
 
                     int c_num = requestCode - PICK_CONTACT_REQUEST;
 
