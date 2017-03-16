@@ -148,8 +148,10 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
                 //TODO go to select/take photo dialog
                 break;
             case(R.id.bluetooth_button):
-                Intent bluetoothIntent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-                startActivity(bluetoothIntent);
+                //TODO: instructions for pairing for DE1 device
+//                Intent bluetoothIntent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+//                startActivity(bluetoothIntent);
+                BluetoothService.getService().connect();
                 break;
         }
     }

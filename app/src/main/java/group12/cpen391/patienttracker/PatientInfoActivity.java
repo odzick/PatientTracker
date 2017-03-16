@@ -3,6 +3,7 @@ package group12.cpen391.patienttracker;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -10,6 +11,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.google.android.gms.maps.GoogleMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PatientInfoActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, AdapterView.OnClickListener {
 
@@ -70,18 +74,32 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
     }
 
     @Override
-    public void onClick(View v){
-        switch(v.getId()){
-            case(R.id.confirm_fab):
-                currentName = mEditName.toString();
-                currentPHN = mEditPHN.toString();
-                currentAddress = mEditAddress.toString();
-                currentCity = mEditCity.toString();
-                currentPostalCode = mEditPostalCode.toString();
-                String cityLine = currentCity + ", " + currentProvince + ", " + currentPostalCode;
-                //TODO error toasters for blank entries
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case (R.id.confirm_fab):
                 // (limited input types and size in xml already)
-                //TODO Send to De1 then exit activity
+                currentName = mEditName.getText().toString();
+                currentPHN = mEditPHN.getText().toString();
+                currentAddress = mEditAddress.getText().toString();
+                currentCity = mEditCity.getText().toString();
+                currentPostalCode = mEditPostalCode.getText().toString();
+                //TODO error toasters for blank entries
+
+                //TODO: move to helper function.
+                // Create
+                JSONObject o = new JSONObject();
+                try {
+                    o.put("name", currentName);
+                    o.put("phn", currentPHN);
+                    o.put("address", currentAddress);
+                    o.put("city", currentCity + ", " + currentProvince + ", " + currentPostalCode);
+                } catch (JSONException e){ }
+
+                // Write json to DE1.
+                BluetoothService bt = BluetoothService.getService();
+                bt.write(o.toString());
+
+                //TODO: exit activity and feedback on successful update
                 break;
         }
     }
