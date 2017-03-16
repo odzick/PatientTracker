@@ -97,7 +97,7 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
 
                 // Write json to DE1.
                 BluetoothService bt = BluetoothService.getService();
-                bt.write(o.toString());
+                bt.write("#" + o.toString() + "#");
 
                 //TODO: feedback on successful update
                 this.finish();

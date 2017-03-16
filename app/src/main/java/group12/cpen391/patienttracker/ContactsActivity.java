@@ -169,35 +169,27 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
 
         JSONObject o = new JSONObject();
         try {
-            JSONObject o1 = new JSONObject();
-            o1.put("name", currentC1Name);
-            o1.put("phone", currentC1Number);
-            o1.put("relation", currentC1Relation);
-            o.put("contact1", o1);
+            o.put("C1name", currentC1Name);
+            o.put("C1phone", currentC1Number);
+            o.put("C1relation", currentC1Relation);
 
-            JSONObject o2 = new JSONObject();
-            o2.put("name", currentC2Name);
-            o2.put("phone", currentC2Number);
-            o2.put("relation", currentC2Relation);
-            o.put("contact2", o2);
+            o.put("C2name", currentC2Name);
+            o.put("C2phone", currentC2Number);
+            o.put("C2relation", currentC2Relation);
 
-            JSONObject o3 = new JSONObject();
-            o3.put("name", currentC3Name);
-            o3.put("phone", currentC3Number);
-            o3.put("relation", currentC3Relation);
-            o.put("contact3", o3);
+            o.put("C3name", currentC3Name);
+            o.put("C3phone", currentC3Number);
+            o.put("C3relation", currentC3Relation);
 
-            JSONObject o4 = new JSONObject();
-            o4.put("name", currentC4Name);
-            o4.put("phone", currentC4Number);
-            o4.put("relation", currentC4Relation);
-            o.put("contact4", o4);
+            o.put("C4name", currentC4Name);
+            o.put("C4phone", currentC4Number);
+            o.put("C4relation", currentC4Relation);
 
         } catch (JSONException e){ }
 
         // Write json to DE1.
         BluetoothService bt = BluetoothService.getService();
-        bt.write(o.toString());
+        bt.write("#" + o.toString() + "#");
     }
 
     @Override
