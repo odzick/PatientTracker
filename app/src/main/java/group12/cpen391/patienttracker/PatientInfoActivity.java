@@ -99,7 +99,8 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                 BluetoothService bt = BluetoothService.getService();
                 bt.write(o.toString());
 
-                //TODO: exit activity and feedback on successful update
+                //TODO: feedback on successful update
+                this.finish();
                 break;
         }
     }
