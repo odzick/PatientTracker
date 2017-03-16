@@ -169,21 +169,30 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
 
         JSONObject o = new JSONObject();
         try {
-            o.put("nameC1", currentC1Name);
-            o.put("phoneC1", currentC1Number);
-            o.put("relationC1", currentC1Relation);
+            JSONObject o1 = new JSONObject();
+            o1.put("name", currentC1Name);
+            o1.put("phone", currentC1Number);
+            o1.put("relation", currentC1Relation);
+            o.put("contact1", o1);
 
-            o.put("nameC2", currentC2Name);
-            o.put("phoneC2", currentC2Number);
-            o.put("relationC2", currentC2Relation);
+            JSONObject o2 = new JSONObject();
+            o2.put("name", currentC2Name);
+            o2.put("phone", currentC2Number);
+            o2.put("relation", currentC2Relation);
+            o.put("contact2", o2);
 
-            o.put("nameC3", currentC3Name);
-            o.put("phoneC3", currentC3Number);
-            o.put("relationC3", currentC3Relation);
+            JSONObject o3 = new JSONObject();
+            o3.put("name", currentC3Name);
+            o3.put("phone", currentC3Number);
+            o3.put("relation", currentC3Relation);
+            o.put("contact3", o3);
 
-            o.put("nameC4", currentC4Name);
-            o.put("phoneC4", currentC4Number);
-            o.put("relationC4", currentC4Relation);
+            JSONObject o4 = new JSONObject();
+            o4.put("name", currentC4Name);
+            o4.put("phone", currentC4Number);
+            o4.put("relation", currentC4Relation);
+            o.put("contact4", o4);
+
         } catch (JSONException e){ }
 
         // Write json to DE1.
