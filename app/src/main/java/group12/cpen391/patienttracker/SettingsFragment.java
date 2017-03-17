@@ -1,13 +1,18 @@
 package group12.cpen391.patienttracker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -41,6 +46,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private View rootView;
     private Button mChangeInfoButton;
@@ -88,10 +94,12 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
             mChangeInfoButton = (Button) rootView.findViewById(R.id.patient_info_button);
             mPairDeviceButton = (Button) rootView.findViewById(R.id.bluetooth_button);
             mChangeContactButton = (Button) rootView.findViewById(R.id.contacts_button);
+            mChangePhotoButton = (Button) rootView.findViewById(R.id.change_photo_button);
 
             mChangeInfoButton.setOnClickListener(this);
             mPairDeviceButton.setOnClickListener(this);
             mChangeContactButton.setOnClickListener(this);
+            mChangePhotoButton.setOnClickListener(this);
 
         } catch (InflateException e){
         Log.e("settingsview", "Inflate exception");
@@ -145,14 +153,49 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
                 startActivity(contactsIntent);
                 break;
             case(R.id.change_photo_button):
-                //TODO go to select/take photo dialog
+                selectImage();
                 break;
             case(R.id.bluetooth_button):
                 //TODO: instructions for pairing for DE1 device
 //                Intent bluetoothIntent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
 //                startActivity(bluetoothIntent);
-                BluetoothService.getService().connect();
+               // BluetoothService.getService().connect();
+                Intent bluetoothIntent = new Intent(this.getContext(), BluetoothActivity.class);
+                startActivity(bluetoothIntent);
                 break;
+        }
+    }
+
+    private void selectImage() {
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }
+                else if (items[item].equals("Choose from Library")) {
+
+                }
+                else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.create().show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+            }
         }
     }
 }

@@ -335,8 +335,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         }
 
         protected void onPostExecute(Void result) {
-            pathPoints = path;
-            polyline.setPoints(pathPoints);
+            if(path != null) {
+                pathPoints = path;
+                polyline.setPoints(pathPoints);
+            }
             if(pathPoints.size() != 0) {
                 patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
             }
