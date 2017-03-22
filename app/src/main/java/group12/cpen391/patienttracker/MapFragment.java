@@ -336,9 +336,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 //get manifest
                 String [] parts = s.split(",");
 
+                byte[] c = new byte[256];
 
                 //request for a single image
-                outStream.write(parts[0].getBytes("US-ASCII"));
+                outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
+                inStream.read(c, 0, 256);
+
+                s = new String(c);
+                if(!s.contains("OK")){
+                    outStream.close();
+                    inStream.close();
+                    imageSocket.close();
+                    return;
+                }
+                outStream.write(("REQ: PHT\nid:" + parts[0]).getBytes("US-ASCII"));
 
                 //path = parseGPS(s);
                 outStream.close();
@@ -409,6 +420,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         }
 
         protected Void doInBackground(Void... params) {
+            imageReceiveing();
             connect();
             return null;
         }
