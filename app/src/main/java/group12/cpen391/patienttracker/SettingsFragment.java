@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +22,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
@@ -47,6 +57,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
 
     private OnFragmentInteractionListener mListener;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_GALLERY = 2;
 
     private View rootView;
     private Button mChangeInfoButton;
@@ -179,7 +190,16 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
                     }
                 }
                 else if (items[item].equals("Choose from Library")) {
+                    Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    getIntent.setType("image/*");
 
+                    Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    pickIntent.setType("image/*");
+
+                    Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+                    startActivityForResult(chooserIntent, REQUEST_IMAGE_GALLERY);
                 }
                 else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
@@ -192,10 +212,40 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE ) {
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
+                sendBitmap(imageBitmap);
+            }
+            if (requestCode == REQUEST_IMAGE_GALLERY) {
+                Uri imageUri = data.getData();
+                InputStream imageStream = null;
+                try {
+                    imageStream = getContext().getContentResolver().openInputStream(imageUri);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                Bitmap imageBitmap = BitmapFactory.decodeStream(imageStream);
+                sendBitmap(imageBitmap);
             }
         }
+    }
+
+    void sendBitmap(Bitmap imageBitmap){
+        int pixels[] = new int[250 * 250];
+        imageBitmap.getPixels(pixels, 0 ,250, 0, 0, 250, 250);
+        Log.i ("IMAGE", String.format("pixel 0,0 " + String.format( "0x%08X", imageBitmap.getPixel(0, 0))));
+        Log.i("IMAGE", "pixel buffer " + Arrays.toString(pixels));
+        Log.i("IMAGE", "image size " + pixels.length);
+
+        JSONObject o = new JSONObject();
+        try {
+            o.put("Image", Arrays.toString(pixels));
+
+        } catch (JSONException e){ }
+
+        // Write json to DE1.
+        BluetoothService bt = BluetoothService.getService();
+        bt.write("#" + o.toString() + "#");
     }
 }
