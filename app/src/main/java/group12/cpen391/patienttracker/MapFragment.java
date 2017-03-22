@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -70,6 +71,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
     private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
 
+    PopupWindow myPopup;
 
     public MapFragment() {
         // Required empty public constructor
@@ -323,7 +325,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 }
                 outStream.write(("REQ:MAN \n DEVICE:1").getBytes("US-ASCII"));
 
-
+                s= "";
                 //byte array, offset, length
 
                 do {
@@ -337,7 +339,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 String [] parts = s.split(",");
 
                 byte[] c = new byte[256];
-
+                System.out.println(s);
+/*
                 //request for a single image
                 outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
                 inStream.read(c, 0, 256);
@@ -350,7 +353,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                     return;
                 }
                 outStream.write(("REQ: PHT\nid:" + parts[0]).getBytes("US-ASCII"));
-
+*/
                 //path = parseGPS(s);
                 outStream.close();
                 inStream.close();
@@ -437,6 +440,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             if(pathPoints.size() != 0) {
                 patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
             }
+
+           // myPopup = new PopupWindow(this);
         }
     }
 }
