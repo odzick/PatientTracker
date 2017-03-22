@@ -288,9 +288,78 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         }
     }
 
+
+
+
     public class ServerConnector extends AsyncTask<Void, Void, Void> {
 
         ArrayList<LatLng> path = new ArrayList<LatLng>();
+
+
+        protected void imageReceiveing(){
+
+            String s  = "";
+            String hostName = "g12host.ddns.net";
+            int portNumber = 3307;
+
+            byte[] b = new byte[256];
+
+            try {
+
+                Socket imageSocket = new Socket(hostName, portNumber);
+
+                OutputStream outStream = imageSocket.getOutputStream();
+                InputStream inStream = imageSocket.getInputStream();
+
+                outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
+                inStream.read(b, 0, 256);
+
+                s = new String(b);
+                if(!s.contains("OK")){
+                    outStream.close();
+                    inStream.close();
+                    imageSocket.close();
+                    return;
+                }
+                outStream.write(("REQ:MAN \n DEVICE:1").getBytes("US-ASCII"));
+
+
+                //byte array, offset, length
+
+                do {
+
+                    inStream.read(b, 0, 256);
+                    s += new String(b, "US-ASCII");
+                } while (inStream.available()!=0);
+
+
+                //get manifest
+                String [] parts = s.split(",");
+
+
+                //request for a single image
+                outStream.write(parts[0].getBytes("US-ASCII"));
+
+                //path = parseGPS(s);
+                outStream.close();
+                inStream.close();
+                imageSocket.close();
+            }
+
+            catch  (UnknownHostException e) {
+                e.printStackTrace();
+            }
+
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+
+
+
+        }
 
         protected void connect() {
             String s  = "";
