@@ -233,52 +233,36 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
 
     void sendBitmap(Bitmap imageBitmap){
         int pixels[] = new int[250  * 250];
-        char bitPixels[] = new char[250 * 250];
-        imageBitmap.getPixels(pixels, 0 , 250, 0, 0, 250, 250);
+        byte bytePixels[] = new byte[250 * 250];
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, 250, 250, false);
+        scaledBitmap.getPixels(pixels, 0 , 250, 0, 0, 250, 250);
         Log.i ("IMAGE", String.format("pixel 0,0 " + String.format( "0x%08X", imageBitmap.getPixel(0, 0))));
         Log.i("IMAGE", "pixel buffer " + Arrays.toString(pixels));
         Log.i("IMAGE", "image size " + pixels.length);
 
+        ARGBto6bitRGB(pixels, bytePixels);
+        String toSend = new String(bytePixels);
+        Log.i("IMAGE", "pixel buffer " + toSend);
 
-        ARGBto6bitRGB(pixels, bitPixels);
-
-       // Log.i("IMAGE", "pixel buffer " + charArraytoString(bitPixels));
-
-        JSONObject o = new JSONObject();
-        try {
-            o.put("Image", String.valueOf(bitPixels));
-        } catch (JSONException e){ }
+//        JSONObject o = new JSONObject();
+//        try {
+//            o.put("Image", toSend);
+//        } catch (JSONException e){ }
 
         // Write json to DE1.
         BluetoothService bt = BluetoothService.getService();
-        bt.write("#" + o.toString() + "#");
+        bt.write("#{\"" + "Image\":\"" + toSend + "\"}#");
     }
 
-    void ARGBto6bitRGB(int[] ARGB, char[] RGB){
+    void ARGBto6bitRGB(int[] ARGB, byte[] RGB){
         int pixelIn;
         int pixel;
 
         for (int i = 0; i <  ARGB.length; i++){
             pixelIn = ARGB[i];
             pixel = ((pixelIn & 0xc00000) >> 18) | ((pixelIn & 0xc000) >> 12) | ((pixelIn & 0xc0) >> 6);
-            if( pixel >= 0 && pixel <= 32){
-                RGB[i] = '!';
-           }else {
-                RGB[i] = (char) pixel;
-           }
-            //Log.i ("IMAGE", String.format("pixel " + i + " " + String.format( "0x%08X", RGB[i])));
+            RGB[i] = (byte) pixel;
         }
-    }
-
-    String charArraytoString(char[] inChar){
-        String outString = "";
-
-        for(int i = 0; i < inChar.length; i++){
-            String cpystr = outString;
-            outString = cpystr + "" + inChar[i];
-            Log.i("charArraytoString", " " + outString);
-        }
-
-        return outString;
     }
 }
