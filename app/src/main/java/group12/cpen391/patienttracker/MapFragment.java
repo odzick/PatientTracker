@@ -1,10 +1,13 @@
 package group12.cpen391.patienttracker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.InflateException;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 
@@ -35,6 +39,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static group12.cpen391.patienttracker.serverMessageParsing.Translator.parseGPS;
 
@@ -70,6 +77,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     private Polyline polyline;
 
     private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
+    private Map <Integer, Bitmap> photos = new ConcurrentHashMap<Integer, Bitmap>();
+    private ImageView iv;
 
     PopupWindow myPopup;
 
@@ -130,6 +139,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             mSpinner.setAdapter(adapter);
 
             mCurrentLatLng = ((MainActivity) getActivity()).getLatLng();
+
+            iv =(ImageView) rootView.findViewById(R.id.mainImage);
 
         }catch (InflateException e){
             Log.e("mapview", "Inflate exception");
@@ -328,36 +339,59 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 s= "";
                 //byte array, offset, length
 
+                //get manifest
                 do {
 
                     inStream.read(b, 0, 256);
-                    s += new String(b, "US-ASCII");
+                    s += (new String(b, "US-ASCII")).trim();
                 } while (inStream.available()!=0);
 
-
-                //get manifest
-                String [] parts = s.split(",");
-
-                byte[] c = new byte[256];
-                System.out.println(s);
-/*
-                //request for a single image
-                outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
-                inStream.read(c, 0, 256);
-
-                s = new String(c);
-                if(!s.contains("OK")){
-                    outStream.close();
-                    inStream.close();
-                    imageSocket.close();
-                    return;
-                }
-                outStream.write(("REQ: PHT\nid:" + parts[0]).getBytes("US-ASCII"));
-*/
-                //path = parseGPS(s);
                 outStream.close();
                 inStream.close();
                 imageSocket.close();
+
+                String [] rows = s.split("\n");
+
+                for (String row : rows) {
+                    String[] parts = row.split(",");
+
+                    System.out.println(s);
+
+                    imageSocket = new Socket(hostName, portNumber);
+
+                     outStream = imageSocket.getOutputStream();
+                     inStream = imageSocket.getInputStream();
+
+                    outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
+                    inStream.read(b, 0, 256);
+
+                    s = new String(b);
+                    if(s.contains("OK")){
+                        int id = Integer.parseInt(parts[0]);
+                        outStream.write(("REQ:PHT \n ID:"+ parts[0]).getBytes("US-ASCII"));
+
+                        //reading image to inStream size
+                        /*
+                        s = "";
+
+                        int bytesRead;
+                        do {
+                            byte[] c = new byte[1024];
+                            bytesRead = inStream.read(c, 0, 1024);
+                            if(bytesRead > 0) s += Arrays.copyOfRange(c, 0, bytesRead);
+                        }while (bytesRead > -1);
+*/
+                        Bitmap pic = BitmapFactory.decodeStream(inStream);
+                       // System.out.println(s);
+                        System.out.println(pic);
+                        photos.put(id, pic);
+                    }
+                    outStream.close();
+                    inStream.close();
+                    imageSocket.close();
+
+                }
+
             }
 
             catch  (UnknownHostException e) {
@@ -367,10 +401,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-
-
 
 
         }
@@ -441,7 +471,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                 patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
             }
 
-           // myPopup = new PopupWindow(this);
+           iv.setImageBitmap(photos.get(2));
         }
     }
 }
