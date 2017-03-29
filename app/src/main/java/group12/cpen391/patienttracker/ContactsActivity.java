@@ -189,7 +189,7 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
 
         // Write json to DE1.
         BluetoothService bt = BluetoothService.getService();
-        bt.write("#" + o.toString() + "#");
+        bt.write(o.toString());
     }
 
     @Override

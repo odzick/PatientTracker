@@ -245,14 +245,8 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
         String toSend = new String(bytePixels);
         Log.i("IMAGE", "pixel buffer " + toSend);
 
-//        JSONObject o = new JSONObject();
-//        try {
-//            o.put("Image", toSend);
-//        } catch (JSONException e){ }
-
-        // Write json to DE1.
         BluetoothService bt = BluetoothService.getService();
-        bt.write("#{\"" + "Image\":\"" + toSend + "\"}#");
+        bt.write("~" + toSend);
     }
 
     void ARGBto6bitRGB(int[] ARGB, byte[] RGB){

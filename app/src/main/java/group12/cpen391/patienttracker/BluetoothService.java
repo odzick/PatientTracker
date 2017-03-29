@@ -78,6 +78,7 @@ public class BluetoothService {
             // TODO: replace with error toast
             Log.v("Bluetooth", "Failed write: Not connected to Bluetooth device");
         }
+        data = "|" + data + "|";
         Log.v("Bluetooth", "Writing to DE1: " + data);
         mConnectedThread.write(data.getBytes());
     }
@@ -121,31 +122,35 @@ public class BluetoothService {
         private final BluetoothSocket mmSocket;
         private final OutputStream mmOutStream;
 
-        public ConnectedThread(BluetoothSocket socket){
+        public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             OutputStream tmpOut = null;
             try {
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
             mmOutStream = tmpOut;
         }
 
         public void run() {
             isRunning = true;
             Log.v("Bluetooth", "ConnectedThread created. isRunning = " + isRunning);
-            while (!Thread.currentThread().isInterrupted()) { }
+            while (!Thread.currentThread().isInterrupted()) {
+            }
         }
 
         public void write(byte[] bytes) {
             try {
                 mmOutStream.write(bytes);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
 
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
             interrupt();
         }
     }

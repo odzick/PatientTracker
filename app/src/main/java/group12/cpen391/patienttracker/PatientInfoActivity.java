@@ -91,13 +91,13 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                 try {
                     o.put("name", currentName);
                     o.put("phn", currentPHN);
-                    o.put("address", currentAddress);
+                    o.put("street", currentAddress);
                     o.put("city", currentCity + ", " + currentProvince + ", " + currentPostalCode);
                 } catch (JSONException e){ }
 
                 // Write json to DE1.
                 BluetoothService bt = BluetoothService.getService();
-                bt.write("#" + o.toString() + "#");
+                bt.write(o.toString());
 
                 //TODO: feedback on successful update
                 this.finish();
