@@ -1,5 +1,6 @@
 package group12.cpen391.patienttracker;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +60,7 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     private OnFragmentInteractionListener mListener;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_GALLERY = 2;
+    static final int REQUEST_IMAGE_CROP = 3;
 
     private View rootView;
     private Button mChangeInfoButton;
@@ -212,24 +215,38 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE ) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE || requestCode == REQUEST_IMAGE_GALLERY ) {
+                Uri imageUri = data.getData();
+                doCrop(imageUri);
+            }
+            if(requestCode == REQUEST_IMAGE_CROP){
                 Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 sendBitmap(imageBitmap);
             }
-            if (requestCode == REQUEST_IMAGE_GALLERY) {
-                Uri imageUri = data.getData();
-                InputStream imageStream = null;
-                try {
-                    imageStream = getContext().getContentResolver().openInputStream(imageUri);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                Bitmap imageBitmap = BitmapFactory.decodeStream(imageStream);
-                sendBitmap(imageBitmap);
-            }
         }
     }
+    private void doCrop(Uri picUri) {
+        try {
+
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+
+            cropIntent.setDataAndType(picUri, "image/*");
+            cropIntent.putExtra("crop", "true");
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            cropIntent.putExtra("return-data", true);
+            startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
+        }
+        // respond to users whose devices do not support the crop action
+        catch (ActivityNotFoundException anfe) {
+            // display an error message
+            String errorMessage = "Whoops - your device doesn't support the crop action!";
+            Toast toast = Toast.makeText(this.getContext(), errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
 
     void sendBitmap(Bitmap imageBitmap){
         int pixels[] = new int[250  * 250];
