@@ -42,7 +42,8 @@
         </activity>
         <activity android:name=".PatientInfoActivity" />
         <activity android:name=".ContactsActivity" />
-        <activity android:name=".BluetoothActivity"></activity>
+        <activity android:name=".BluetoothActivity" />
+        <activity android:name=".SendImageActivity"></activity>
     </application>
 
 </manifest>
