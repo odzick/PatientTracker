@@ -171,9 +171,6 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
                 break;
             case(R.id.bluetooth_button):
                 //TODO: instructions for pairing for DE1 device
-//                Intent bluetoothIntent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
-//                startActivity(bluetoothIntent);
-               // BluetoothService.getService().connect();
                 Intent bluetoothIntent = new Intent(this.getContext(), BluetoothActivity.class);
                 startActivity(bluetoothIntent);
                 break;
@@ -225,10 +222,12 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
                 Intent intent = new Intent(this.getContext(), SendImageActivity.class);
                 intent.putExtra("IMG_BITMAP", imageBitmap);
                 startActivity(intent);
-                //sendBitmap(imageBitmap);
             }
         }
     }
+    /*
+     *  Opens a 1:1 cropping activity on the image at picUri.
+     */
     private void doCrop(Uri picUri) {
         try {
 
