@@ -26,6 +26,14 @@
         <item>YT</item>
     </string-array>
 
+    <!-- BluetoothActivity strings -->
+    <string name="bt.device_name">Device Name: %1$s</string>
+    <string name="bt.device_mac">Device MAC Address: %1$s</string>
+    <string name="bt.no_devices">No bluetooth devices to pair with</string>
+    <string name="bt.das">No bluetooth devices to pair with</string>
+    <string name="bt.dasd">No bluetooth devices to pair with</string>
+    <string name="bt.dasdas">No bluetooth devices to pair with</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
