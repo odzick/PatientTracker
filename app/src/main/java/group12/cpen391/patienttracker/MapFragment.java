@@ -287,23 +287,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         // Another interface callback
     }
 
-
-    public void populatePath(){
-        //TODO populate with real server data
-        pathPoints.add(new LatLng(49.2606, -123.2460));
-        pathPoints.add(new LatLng(59.2606, -123.2460));
-    }
-
-    public void addPathtoPolyline(PolylineOptions p){
-        for(int i = 0; i < pathPoints.size(); i++){
-            p.add(pathPoints.get(i));
-        }
-    }
-
-
-
-
-
     public class ServerConnector extends AsyncTask<Void, Void, Void> {
 
         ArrayList<LatLng> path = new ArrayList<LatLng>();
