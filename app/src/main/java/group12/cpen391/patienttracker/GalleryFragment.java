@@ -1,23 +1,28 @@
 package group12.cpen391.patienttracker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link GalleryFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link GalleryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class GalleryFragment extends Fragment {
+
+    private GridView mGridView;
+
+    private ArrayList<ImageItem> imageList;
+
+    private View rootView;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -60,19 +65,44 @@ public class GalleryFragment extends Fragment {
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
+        mGridView = (GridView) rootView.findViewById(R.id.gallery_gridview);
+
+        // Populate imageList array/get images
+        imageList = new ArrayList<ImageItem>();
+        for(int i = 0 ; i <10; i ++){
+            String currentDateTimeString = DateFormat.getDateInstance().format(new Date());
+            imageList.add(new ImageItem("TEST", currentDateTimeString));
+        }
+
+        GalleryAdapter adapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout, imageList);
+        mGridView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        mGridView.setOnItemClickListener(
+            new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                    ImageItem item = (ImageItem) parent.getItemAtPosition(position);
+                    Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
+                    intent.putExtra("image", item.image);
+                    startActivity(intent);
+                }
+            });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_gallery, container, false);
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+// TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    if (mListener != null) {
+        mListener.onFragmentInteraction(uri);
     }
+}
 
     @Override
     public void onAttach(Context context) {
