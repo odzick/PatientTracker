@@ -152,19 +152,19 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
 
     private void copyToSend() {
         currentC1Name = mC1Name.getText().toString();
-        currentC1Number = mC1Number.getText().toString();
+        currentC1Number = mC1Number.getText().toString().replaceAll("[^0-9+]", "");
         currentC1Relation = mC1Relation.getText().toString();
 
         currentC2Name = mC2Name.getText().toString();
-        currentC2Number = mC2Number.getText().toString();
+        currentC2Number = mC2Number.getText().toString().replaceAll("[^0-9+]", "");
         currentC2Relation = mC2Relation.getText().toString();
 
         currentC3Name = mC3Name.getText().toString();
-        currentC3Number = mC3Number.getText().toString();
+        currentC3Number = mC3Number.getText().toString().replaceAll("[^0-9+]", "");
         currentC3Relation = mC3Relation.getText().toString();
 
         currentC4Name = mC4Name.getText().toString();
-        currentC4Number = mC4Number.getText().toString();
+        currentC4Number = mC4Number.getText().toString().replaceAll("[^0-9+]", "");
         currentC4Relation = mC4Relation.getText().toString();
 
         JSONObject o = new JSONObject();
@@ -213,7 +213,7 @@ public class ContactsActivity extends AppCompatActivity implements AdapterView.O
                     phones.moveToFirst();
 
                     String phoneNo = phones.getString(phones.getColumnIndex(
-                            ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll("[^0-9+]", "");
+                            ContactsContract.CommonDataKinds.Phone.NUMBER));
 
                     //TODO normalize numbers (maybe not needed)
 
