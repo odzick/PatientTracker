@@ -36,6 +36,7 @@ public class SendImageActivity extends AppCompatActivity implements AdapterView.
         switch(v.getId()){
             case(R.id.confirm_image_fab):
                 sendBitmap(toSendBitmap);
+                this.finish();
                 break;
         }
     }
