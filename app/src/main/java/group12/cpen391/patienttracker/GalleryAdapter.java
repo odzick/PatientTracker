@@ -122,6 +122,7 @@ public class GalleryAdapter extends BaseAdapter {
                 is.close();
 
                 String jsonString = new String(buffer, "UTF-8");
+                Log.v("GALLERY", "Read saved json metadata: " + jsonString);
                 System.out.println(jsonString);
                 JSONObject jsonObject = new JSONObject(jsonString.trim());
                 Iterator<?> keys = jsonObject.keys();
