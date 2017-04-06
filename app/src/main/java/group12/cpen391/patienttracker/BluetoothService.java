@@ -78,6 +78,7 @@ public class BluetoothService {
             mConnectThread.start();
         } else {
             showToast(BT_ERR_NO_DEVICES);
+            openBluetoothSettings();
         }
     }
 
@@ -111,6 +112,12 @@ public class BluetoothService {
         Handler h = BluetoothActivity.getHandler();
         Message msg = h.obtainMessage(BluetoothActivity.UPDATE_UI);
         msg.obj = devicePaired;
+        h.sendMessage(msg);
+    }
+
+    private void openBluetoothSettings() {
+        Handler h = BluetoothActivity.getHandler();
+        Message msg = h.obtainMessage(BluetoothActivity.OPEN_BT_SETTINGS);
         h.sendMessage(msg);
     }
 
