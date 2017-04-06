@@ -334,7 +334,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
                 for (String row : rows) {
                     String[] parts = row.split(",");
-
                     System.out.println(s);
 
                     imageSocket = new Socket(hostName, portNumber);
@@ -371,6 +370,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                                 String filename =
                                         "Image-" + id + "-" + rand.nextInt(10000) + ".jpg";
                                 File f = new File(getContext().getFilesDir(), filename);
+
+                                // Save image to app's internal storage
                                 if (f.exists()){
                                     f.delete();
                                 }
@@ -382,7 +383,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                                     gallery.addItem(new ImageItem(id, date, filename));
                                     Log.v("GALLERY", "Saved image to filesystem: " + filename);
                                 } catch (Exception e){
-                                    Log.e("GALLERY", e.toString());
+                                    Log.e("GALLERY", "Exception saving image to filesystem", e);
                                 }
                             } else {
                                 Log.v("GALLERY", "Image was null, not saved");

@@ -21,6 +21,9 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/*
+ *  Adapter class for the Gallery page GridView
+ */
 public class GalleryAdapter extends BaseAdapter {
     private Context mContext;
     private static ArrayList<ImageItem> imageList;
@@ -28,7 +31,6 @@ public class GalleryAdapter extends BaseAdapter {
     public GalleryAdapter(Context context, int textViewResourceId) {
         mContext = context;
         imageList = getSavedImageList();
-//        imageList = new ArrayList<ImageItem>();
     }
 
     @Override
@@ -38,9 +40,13 @@ public class GalleryAdapter extends BaseAdapter {
 
     public void addItem(ImageItem item) { imageList.add(item); }
 
+    /*
+     *  Update metadata.json for saved images in the app's internal storage.
+     */
     public void updateJsonMetadata() {
         JSONObject metadata = new JSONObject();
 
+        // Construct new JSON object containing all image items
         for (ImageItem i : imageList){
             JSONObject item = new JSONObject();
             try {
@@ -50,21 +56,25 @@ public class GalleryAdapter extends BaseAdapter {
                 item.put("filename", i.filename);
                 metadata.put(tag, item);
             } catch (JSONException e){
-                Log.e("GALLERY", e.toString());
+                Log.e("GALLERY", "Exception constructing new JSON object", e);
             }
         }
 
+        // Write JSON object to app internal storage.
         try {
             FileOutputStream os = mContext.openFileOutput("metadata.json", Context.MODE_PRIVATE);
             Log.v("GALLERY", "Updating JSON metadata: " + metadata.toString());
             os.write(metadata.toString().getBytes());
             os.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("GALLERY", "Exception saving metadata.json to storage", e);
         }
 
     }
 
+    /*
+     *  Returns true if the gallery contains an image with the given id, and false otherwise.
+     */
     public boolean containsId(int id){
         for (ImageItem i : imageList){
             if (i.id == id) return true;
@@ -95,11 +105,11 @@ public class GalleryAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        // Set text/image for views
-        holder.title.setText(item.date);
-
         File f = new File(mContext.getFilesDir(), item.filename);
         Log.v("GALLERY", "Retrieving image from path: " + mContext.getFilesDir() + item.filename);
+
+        // Set text/image for current view item
+        holder.title.setText(item.date);
         Picasso.with(mContext).load(f).placeholder(R.drawable.ic_error).into(holder.image);
 
         return convertView;
@@ -110,8 +120,12 @@ public class GalleryAdapter extends BaseAdapter {
         ImageView image;
     }
 
+    /*
+     *  Populate the gallery image list from metadata.json in app's internal storage.
+     */
     private ArrayList<ImageItem> getSavedImageList(){
         ArrayList<ImageItem> imageList = new ArrayList<ImageItem>();
+
         try {
             File f = new File(mContext.getFilesDir(), "metadata.json");
             if (f.exists()){
@@ -123,7 +137,7 @@ public class GalleryAdapter extends BaseAdapter {
 
                 String jsonString = new String(buffer, "UTF-8");
                 Log.v("GALLERY", "Read saved json metadata: " + jsonString);
-                System.out.println(jsonString);
+
                 JSONObject jsonObject = new JSONObject(jsonString.trim());
                 Iterator<?> keys = jsonObject.keys();
 
@@ -139,8 +153,9 @@ public class GalleryAdapter extends BaseAdapter {
                 }
             }
         } catch (Exception e) {
-            Log.e("GALLERY", e.toString());
+            Log.e("GALLERY", "Exception reading JSON from metadata.json", e);
         }
+
         return imageList;
     }
 }

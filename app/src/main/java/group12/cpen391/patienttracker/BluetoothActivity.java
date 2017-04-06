@@ -14,8 +14,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 public class BluetoothActivity extends AppCompatActivity {
+    // Handler message types
     public static final int UPDATE_UI = 0;
     public static final int SHOW_TOAST = 1;
     public static final int OPEN_BT_SETTINGS = 2;
@@ -54,26 +54,20 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         };
 
-        mPairSwitch = (Switch) findViewById(R.id.pair_switch);
         bt = BluetoothService.getService();
-
         updateDeviceInfoText();
-
+        mPairSwitch = (Switch) findViewById(R.id.pair_switch);
         mPairSwitch.setChecked(bt.devicePaired());
 
         mPairSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // De-register listener to avoid calling itself
-//                mPairSwitch.setOnCheckedChangeListener(null);
                 mPairSwitch.setChecked(false); // Default to off and let connection logic update switch state
-//                mPairSwitch.setOnCheckedChangeListener(this);
-                boolean devicePaired = bt.devicePaired();
-                Log.v("WHY", "bChecked: " + devicePaired);
-                if (!devicePaired && !bt.isEnabled()) {
+                if (!bt.devicePaired() && !bt.isEnabled()) {
+                    // Bluetooth disabled on mobile device
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivity(enableBtIntent);
-                } else if (!devicePaired) {
+                } else if (!bt.devicePaired()) {
                     bt.connect();
                 } else {
                     bt.close();

@@ -67,6 +67,7 @@ public class GalleryFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
         mGridView = (GridView) rootView.findViewById(R.id.gallery_gridview);
 
+        // Populate and attach gallery adapter to GridView.
         mAdapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout);
         mGridView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
@@ -74,9 +75,9 @@ public class GalleryFragment extends Fragment {
         mGridView.setOnItemClickListener(
             new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                    // Open fullscreen image activity on item click.
                     ImageItem item = (ImageItem) parent.getItemAtPosition(position);
                     Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
-
                     intent.putExtra("filename", item.filename);
                     startActivity(intent);
                 }

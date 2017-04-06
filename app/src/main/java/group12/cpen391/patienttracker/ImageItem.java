@@ -6,6 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/*
+ *  Data structure for keeping track of opened images from filesystem.
+ */
 public class ImageItem {
     public int id;
     public String date;
@@ -22,7 +25,7 @@ public class ImageItem {
             Date d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
             return new SimpleDateFormat("MMMM d, yyyy h:mm a").format(d);
         } catch(ParseException e){
-            Log.e("ImageItem", e.toString());
+            Log.e("ImageItem", "Exception parsing date string for image", e);
             return date;
         }
     }

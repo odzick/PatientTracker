@@ -18,13 +18,15 @@ public class ImageDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
 
-        Context mContext = getApplicationContext();
         Intent i = getIntent();
-        String filename = i.getStringExtra("filename");
+        Context context = getApplicationContext();
 
+        String filename = i.getStringExtra("filename");
+        File f = new File(context.getFilesDir(), filename);
+        Log.v("GALLERY", "Retrieving image from path: " + context.getFilesDir() + filename);
+
+        // Load image from filesystem into ImageView
         ImageView imageView = (ImageView) findViewById(R.id.image_fullscreen);
-        File f = new File(mContext.getFilesDir(), filename);
-        Log.v("GALLERY", "Retrieving image from path: " + mContext.getFilesDir() + filename);
-        Picasso.with(mContext).load(f).placeholder(R.drawable.ic_error).into(imageView);
+        Picasso.with(context).load(f).placeholder(R.drawable.ic_error).into(imageView);
     }
 }

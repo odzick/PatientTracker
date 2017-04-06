@@ -233,6 +233,9 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
         }
     }
 
+    /*
+     *  Enable/disable Bluetooth-related buttons based on connection state.
+     */
     public static void updateBluetoothButtons(boolean devicePaired){
         mChangeInfoButton.setEnabled(devicePaired);
         mChangeContactButton.setEnabled(devicePaired);

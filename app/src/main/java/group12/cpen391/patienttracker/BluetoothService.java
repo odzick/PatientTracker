@@ -57,6 +57,9 @@ public class BluetoothService {
         return mDevice.getAddress();
     }
 
+    /*
+     *  Establishes a connection with the paired Bluetooth device.
+     */
     public synchronized void connect() {
         devicePaired = false;
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
@@ -66,9 +69,9 @@ public class BluetoothService {
         Log.v(TAG, "connect(): pairedDevices.size() = " + pairedDevices.size());
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                // TODO: choose device based on name/MAC
+//                String deviceName = device.getName();
+//                String deviceHardwareAddress = device.getAddress(); // MAC address
+//                // TODO: choose device based on name/MAC
                 mDevice = device;
             }
         }
@@ -82,6 +85,9 @@ public class BluetoothService {
         }
     }
 
+    /*
+     *  Closes all threads connected to the Bluetooth socket.
+     */
     public synchronized void close() {
         Log.v(TAG, "close(): stopping BT threads");
         mDevice = null;
@@ -91,6 +97,9 @@ public class BluetoothService {
         updateUI(devicePaired);
     }
 
+    /*
+     *  Write byte data to the currectly connected Bluetooth socket.
+     */
     public synchronized void write(String data){
         if (!devicePaired){
             Log.v(TAG, "Failed write: Not connected to Bluetooth device");
@@ -101,6 +110,9 @@ public class BluetoothService {
         mConnectedThread.write(data.getBytes());
     }
 
+    /*
+     *  UI handler method for displaying a response toast.
+     */
     private void showToast(String message) {
         Handler h = BluetoothActivity.getHandler();
         Message msg = h.obtainMessage(BluetoothActivity.SHOW_TOAST);
@@ -108,6 +120,9 @@ public class BluetoothService {
         h.sendMessage(msg);
     }
 
+    /*
+     *  UI handler method for updating text/button/switch UI states.
+     */
     private void updateUI(boolean devicePaired) {
         Handler h = BluetoothActivity.getHandler();
         Message msg = h.obtainMessage(BluetoothActivity.UPDATE_UI);
@@ -115,12 +130,18 @@ public class BluetoothService {
         h.sendMessage(msg);
     }
 
+    /*
+     *  UI handler method for opening Bluetooth settings page when no devices are paired.
+     */
     private void openBluetoothSettings() {
         Handler h = BluetoothActivity.getHandler();
         Message msg = h.obtainMessage(BluetoothActivity.OPEN_BT_SETTINGS);
         h.sendMessage(msg);
     }
 
+    /*
+     *  Background thread for opening a connection to Bluetooth socket.
+     */
     private class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -163,7 +184,9 @@ public class BluetoothService {
         }
     }
 
-
+    /*
+     *  Background thread for handling data transfers to a connected Bluetooth socket.
+     */
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final OutputStream mmOutStream;
