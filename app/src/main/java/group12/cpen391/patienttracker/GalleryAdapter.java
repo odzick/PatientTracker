@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 
 public class GalleryAdapter extends BaseAdapter {
     private Context mContext;
-    private ArrayList<ImageItem> mDataSource;
+    private static ArrayList<ImageItem> mDataSource;
 
     public GalleryAdapter(Context context, int textViewResourceId, ArrayList<ImageItem> items) {
         mContext = context;
@@ -28,10 +27,17 @@ public class GalleryAdapter extends BaseAdapter {
         return mDataSource.size();
     }
 
-    @Override
-    public Object getItem(int position) {
-        return mDataSource.get(position);
+    public void addItem(ImageItem item) { mDataSource.add(item); }
+
+    public boolean containsId(int id){
+        for (ImageItem i : mDataSource){
+            if (i.id == id) return true;
+        }
+        return false;
     }
+
+    @Override
+    public Object getItem(int position) { return mDataSource.get(position); }
 
     @Override
     public long getItemId(int position) {
@@ -54,10 +60,11 @@ public class GalleryAdapter extends BaseAdapter {
         }
 
         // Set text/image for views
-        holder.title.setText(item.title);
-//        holder.image.setImageBitmap(bitmap);
-//        Picasso.with(mContext).load(item.image).placeholder(R.mipmap.ic_launcher).into(holder.image);
-        Picasso.with(mContext).load("file:///android_asset/testimage.jpg").placeholder(R.drawable.ic_error).into(holder.image);
+        holder.title.setText(item.date);
+        holder.image.setImageBitmap(item.image);
+
+//          Picasso.with(mContext).load(item.image).placeholder(R.mipmap.ic_launcher).into(holder.image);
+//        Picasso.with(mContext).load("file:///android_asset/testimage.jpg").placeholder(R.drawable.ic_error).into(holder.image);
 
         return convertView;
     }

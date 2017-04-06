@@ -1,11 +1,15 @@
 package group12.cpen391.patienttracker;
 
-public class ImageItem {
-    public String image;
-    public String title;
+import android.graphics.Bitmap;
 
-    public ImageItem(String image, String title){
+public class ImageItem {
+    public int id;
+    public String date;
+    public Bitmap image;
+
+    public ImageItem(int id, String date, Bitmap image){
+        this.id = id;
+        this.date = date;
         this.image = image;
-        this.title = title;
     }
 }

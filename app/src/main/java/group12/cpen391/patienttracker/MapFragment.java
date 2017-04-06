@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static group12.cpen391.patienttracker.GalleryFragment.imageList;
 import static group12.cpen391.patienttracker.serverMessageParsing.Translator.parseGPS;
 
 
@@ -78,8 +80,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
     private ArrayList<LatLng> pathPoints = new ArrayList<LatLng>();
     private Map <Integer, Bitmap> photos = new ConcurrentHashMap<Integer, Bitmap>();
-    private ImageView iv;
-
     PopupWindow myPopup;
 
     public MapFragment() {
@@ -139,8 +139,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             mSpinner.setAdapter(adapter);
 
             mCurrentLatLng = ((MainActivity) getActivity()).getLatLng();
-
-            iv =(ImageView) rootView.findViewById(R.id.mainImage);
 
         }catch (InflateException e){
             Log.e("mapview", "Inflate exception");
@@ -292,13 +290,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         ArrayList<LatLng> path = new ArrayList<LatLng>();
 
 
-        protected void imageReceiveing(){
+        protected void imageReceiving(){
 
             String s  = "";
             String hostName = "g12host.ddns.net";
             int portNumber = 3307;
 
             byte[] b = new byte[256];
+            GalleryAdapter gallery = GalleryFragment.getAdapter();
 
             try {
 
@@ -342,8 +341,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
 
                     imageSocket = new Socket(hostName, portNumber);
 
-                     outStream = imageSocket.getOutputStream();
-                     inStream = imageSocket.getInputStream();
+                    outStream = imageSocket.getOutputStream();
+                    inStream = imageSocket.getInputStream();
 
                     outStream.write(("Hello\nDevice:Android \n Id:1").getBytes("US-ASCII"));
                     inStream.read(b, 0, 256);
@@ -351,23 +350,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                     s = new String(b);
                     if(s.contains("OK")){
                         int id = Integer.parseInt(parts[0]);
-                        outStream.write(("REQ:PHT \n ID:"+ parts[0]).getBytes("US-ASCII"));
+                        String date = parts[2];
 
-                        //reading image to inStream size
-                        /*
-                        s = "";
+                        if (!gallery.containsId(id)) {
+                            outStream.write(("REQ:PHT \n ID:" + parts[0]).getBytes("US-ASCII"));
 
-                        int bytesRead;
-                        do {
-                            byte[] c = new byte[1024];
-                            bytesRead = inStream.read(c, 0, 1024);
-                            if(bytesRead > 0) s += Arrays.copyOfRange(c, 0, bytesRead);
-                        }while (bytesRead > -1);
-*/
-                        Bitmap pic = BitmapFactory.decodeStream(inStream);
-                       // System.out.println(s);
-                        System.out.println(pic);
-                        photos.put(id, pic);
+                            //reading image to inStream size
+                            /*
+                            s = "";
+
+                            int bytesRead;
+                            do {
+                                byte[] c = new byte[1024];
+                                bytesRead = inStream.read(c, 0, 1024);
+                                if(bytesRead > 0) s += Arrays.copyOfRange(c, 0, bytesRead);
+                            }while (bytesRead > -1);
+    */
+                            Bitmap image = BitmapFactory.decodeStream(inStream);
+                            if (image != null) {
+                                Log.v("GALLERY", "image output: " + image);
+                                gallery.addItem(new ImageItem(id, date, image));
+                            } else {
+                                Log.v("GALLERY", "Image was null, not saved");
+                            }
+                        } else {
+                            Log.v("GALLERY", "Duplicate image not downloaded. id: " + id);
+                        }
                     }
                     outStream.close();
                     inStream.close();
@@ -384,8 +392,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
         protected void connect() {
@@ -436,7 +442,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         }
 
         protected Void doInBackground(Void... params) {
-            imageReceiveing();
+            imageReceiving();
             connect();
             return null;
         }
@@ -446,15 +452,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
         }
 
         protected void onPostExecute(Void result) {
-            if(path != null) {
+            if (path != null) {
                 pathPoints = path;
                 polyline.setPoints(pathPoints);
             }
-            if(pathPoints.size() != 0) {
+            if (pathPoints.size() != 0) {
                 patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
             }
-
-           iv.setImageBitmap(photos.get(2));
+            GalleryFragment.getAdapter().notifyDataSetChanged();
         }
     }
 }

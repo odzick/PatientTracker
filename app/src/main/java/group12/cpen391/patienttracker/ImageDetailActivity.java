@@ -1,6 +1,8 @@
 package group12.cpen391.patienttracker;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,9 +19,10 @@ public class ImageDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_detail);
 
         Intent i = getIntent();
-        String image = i.getStringExtra("image");
+        byte[] byteArray = i.getByteArrayExtra("image");
+        Bitmap image = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         ImageView imageView = (ImageView) findViewById(R.id.image_fullscreen);
-        Picasso.with(this).load("file:///android_asset/testimage.jpg").placeholder(R.drawable.ic_error).into(imageView);
+        imageView.setImageBitmap(image);
     }
 }

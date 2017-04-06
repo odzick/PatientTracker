@@ -2,15 +2,19 @@ package group12.cpen391.patienttracker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,8 +22,8 @@ import java.util.Date;
 public class GalleryFragment extends Fragment {
 
     private GridView mGridView;
-
-    private ArrayList<ImageItem> imageList;
+    public static ArrayList<ImageItem> imageList = new ArrayList<>();
+    private static GalleryAdapter mAdapter;
 
     private View rootView;
 
@@ -73,22 +77,22 @@ public class GalleryFragment extends Fragment {
         mGridView = (GridView) rootView.findViewById(R.id.gallery_gridview);
 
         // Populate imageList array/get images
-        imageList = new ArrayList<ImageItem>();
-        for(int i = 0 ; i <10; i ++){
-            String currentDateTimeString = DateFormat.getDateInstance().format(new Date());
-            imageList.add(new ImageItem("TEST", currentDateTimeString));
-        }
 
-        GalleryAdapter adapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout, imageList);
-        mGridView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        mAdapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout, imageList);
+        mGridView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
 
         mGridView.setOnItemClickListener(
             new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                     ImageItem item = (ImageItem) parent.getItemAtPosition(position);
                     Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
-                    intent.putExtra("image", item.image);
+
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    Bitmap image = item.image;
+                    image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    intent.putExtra("image", byteArray);
                     startActivity(intent);
                 }
             });
@@ -115,6 +119,12 @@ public class GalleryFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.notifyDataSetChanged();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -129,4 +139,9 @@ public class GalleryFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    public static GalleryAdapter getAdapter(){
+        return mAdapter;
+    }
+
 }
