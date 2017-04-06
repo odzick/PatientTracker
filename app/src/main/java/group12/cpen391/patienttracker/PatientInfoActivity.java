@@ -44,6 +44,9 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
     private String currentCity;
     private String currentPostalCode;
     private String currentProvince;
+    private int selectedYear = 1948;
+    private int selectedMonth = 9;
+    private int selectedDay = 13;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -115,6 +118,9 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                     o.put("phn", currentPHN);
                     o.put("street", currentAddress);
                     o.put("city", currentCity + ", " + currentProvince + ", " + currentPostalCode);
+                    o.put("year", selectedYear);
+                    o.put("month", selectedMonth);
+                    o.put("day", selectedDay);
                 } catch (JSONException e) {
                 }
 
@@ -131,6 +137,9 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                     public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
                         selectedmonth = selectedmonth + 1;
                         mEditDate.setText("" + selectedday + "/" + selectedmonth + "/" + selectedyear);
+                        selectedDay = selectedday;
+                        selectedMonth = selectedmonth;
+                        selectedYear = selectedyear;
                     }
                 }, 1970, 1, 1);
                 mDatePicker.setTitle("Select Date");
