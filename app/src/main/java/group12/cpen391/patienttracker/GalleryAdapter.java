@@ -2,6 +2,7 @@ package group12.cpen391.patienttracker;
 
 import android.app.Service;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,33 +12,68 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class GalleryAdapter extends BaseAdapter {
     private Context mContext;
-    private static ArrayList<ImageItem> mDataSource;
+    private static ArrayList<ImageItem> imageList;
 
-    public GalleryAdapter(Context context, int textViewResourceId, ArrayList<ImageItem> items) {
+    public GalleryAdapter(Context context, int textViewResourceId) {
         mContext = context;
-        mDataSource = items;
+        imageList = getSavedImageList();
+//        imageList = new ArrayList<ImageItem>();
     }
 
     @Override
     public int getCount() {
-        return mDataSource.size();
+        return imageList.size();
     }
 
-    public void addItem(ImageItem item) { mDataSource.add(item); }
+    public void addItem(ImageItem item) { imageList.add(item); }
+
+    public void updateJsonMetadata() {
+        JSONObject metadata = new JSONObject();
+
+        for (ImageItem i : imageList){
+            JSONObject item = new JSONObject();
+            try {
+                String tag = Integer.toString(i.hashCode());
+                item.put("id", i.id);
+                item.put("date", i.date);
+                item.put("filename", i.filename);
+                metadata.put(tag, item);
+            } catch (JSONException e){
+                Log.e("GALLERY", e.toString());
+            }
+        }
+
+        try {
+            FileOutputStream os = mContext.openFileOutput("metadata.json", Context.MODE_PRIVATE);
+            Log.v("GALLERY", "Updating JSON metadata: " + metadata.toString());
+            os.write(metadata.toString().getBytes());
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public boolean containsId(int id){
-        for (ImageItem i : mDataSource){
+        for (ImageItem i : imageList){
             if (i.id == id) return true;
         }
         return false;
     }
 
     @Override
-    public Object getItem(int position) { return mDataSource.get(position); }
+    public Object getItem(int position) { return imageList.get(position); }
 
     @Override
     public long getItemId(int position) {
@@ -61,10 +97,10 @@ public class GalleryAdapter extends BaseAdapter {
 
         // Set text/image for views
         holder.title.setText(item.date);
-        holder.image.setImageBitmap(item.image);
 
-//          Picasso.with(mContext).load(item.image).placeholder(R.mipmap.ic_launcher).into(holder.image);
-//        Picasso.with(mContext).load("file:///android_asset/testimage.jpg").placeholder(R.drawable.ic_error).into(holder.image);
+        File f = new File(mContext.getFilesDir(), item.filename);
+        Log.v("GALLERY", "Retrieving image from path: " + mContext.getFilesDir() + item.filename);
+        Picasso.with(mContext).load(f).placeholder(R.drawable.ic_error).into(holder.image);
 
         return convertView;
     }
@@ -72,5 +108,38 @@ public class GalleryAdapter extends BaseAdapter {
     private class ViewHolder {
         TextView title;
         ImageView image;
+    }
+
+    private ArrayList<ImageItem> getSavedImageList(){
+        ArrayList<ImageItem> imageList = new ArrayList<ImageItem>();
+        try {
+            File f = new File(mContext.getFilesDir(), "metadata.json");
+            if (f.exists()){
+                FileInputStream is = new FileInputStream(f);
+                int size = is.available();
+                byte[] buffer = new byte[size];
+                is.read(buffer);
+                is.close();
+
+                String jsonString = new String(buffer, "UTF-8");
+                System.out.println(jsonString);
+                JSONObject jsonObject = new JSONObject(jsonString.trim());
+                Iterator<?> keys = jsonObject.keys();
+
+                while( keys.hasNext() ) {
+                    String key = (String)keys.next();
+                    Object item = jsonObject.get(key);
+                    if ( item instanceof JSONObject ) {
+                        int id = ((JSONObject) item).getInt("id");
+                        String date = ((JSONObject) item).getString("date");
+                        String filename = ((JSONObject) item).getString("filename");
+                        imageList.add(new ImageItem(id, date, filename));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("GALLERY", e.toString());
+        }
+        return imageList;
     }
 }

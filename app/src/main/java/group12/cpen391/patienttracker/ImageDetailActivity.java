@@ -1,5 +1,6 @@
 package group12.cpen391.patienttracker;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 public class ImageDetailActivity extends AppCompatActivity {
 
     @Override
@@ -18,11 +21,13 @@ public class ImageDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_detail);
 
+        Context mContext = getApplicationContext();
         Intent i = getIntent();
-        byte[] byteArray = i.getByteArrayExtra("image");
-        Bitmap image = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        String filename = i.getStringExtra("filename");
 
         ImageView imageView = (ImageView) findViewById(R.id.image_fullscreen);
-        imageView.setImageBitmap(image);
+        File f = new File(mContext.getFilesDir(), filename);
+        Log.v("GALLERY", "Retrieving image from path: " + mContext.getFilesDir() + filename);
+        Picasso.with(mContext).load(f).placeholder(R.drawable.ic_error).into(imageView);
     }
 }
