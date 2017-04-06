@@ -1,15 +1,10 @@
 package group12.cpen391.patienttracker;
 
 import android.app.DatePickerDialog;
-import android.icu.util.Calendar;
-import android.icu.util.TimeZone;
 import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,7 +16,6 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.maps.GoogleMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;

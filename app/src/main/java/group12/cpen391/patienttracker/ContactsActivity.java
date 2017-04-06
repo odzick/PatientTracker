@@ -1,21 +1,18 @@
 package group12.cpen391.patienttracker;
 
-import android.content.Intent;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.telephony.PhoneNumberUtils;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -23,12 +20,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Locale;
-
-import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
-import static java.security.AccessController.getContext;
 
 public class ContactsActivity extends AppCompatActivity implements AdapterView.OnClickListener {
 

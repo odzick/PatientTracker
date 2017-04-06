@@ -1,12 +1,10 @@
 package group12.cpen391.patienttracker;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 
 import group12.cpen391.patienttracker.serverMessageParsing.Translator;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Sean on 2017-03-15.

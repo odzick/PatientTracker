@@ -5,14 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -24,19 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static android.app.Activity.RESULT_OK;
-import static android.content.ContentValues.TAG;
 
 
 /**
