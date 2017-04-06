@@ -1,15 +1,26 @@
 package group12.cpen391.patienttracker;
 
+import android.app.DatePickerDialog;
+import android.icu.util.Calendar;
+import android.icu.util.TimeZone;
+import android.net.Uri;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.GoogleMap;
 
 import org.json.JSONException;
@@ -20,6 +31,7 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
     private EditText mEditName;
     private EditText mEditPHN;
     private EditText mEditAddress;
+    private EditText mEditDate;
     private EditText mEditCity;
     private EditText mEditPostalCode;
     private FloatingActionButton confirmFAB;
@@ -32,7 +44,11 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
     private String currentCity;
     private String currentPostalCode;
     private String currentProvince;
-
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -45,6 +61,9 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
         mEditAddress = (EditText) findViewById(R.id.input_address);
         mEditCity = (EditText) findViewById(R.id.input_city);
         mEditPostalCode = (EditText) findViewById(R.id.input_postal_code);
+
+        mEditDate = (EditText) findViewById(R.id.input_date);
+        mEditDate.setOnClickListener(this);
 
         confirmFAB = (FloatingActionButton) findViewById(R.id.confirm_fab);
         confirmFAB.setOnClickListener(this);
@@ -59,6 +78,9 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spin
         mSpinner.setAdapter(adapter);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,
@@ -93,7 +115,8 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                     o.put("phn", currentPHN);
                     o.put("street", currentAddress);
                     o.put("city", currentCity + ", " + currentProvince + ", " + currentPostalCode);
-                } catch (JSONException e){ }
+                } catch (JSONException e) {
+                }
 
                 // Write json to DE1.
                 BluetoothService bt = BluetoothService.getService();
@@ -102,6 +125,53 @@ public class PatientInfoActivity extends AppCompatActivity implements AdapterVie
                 //TODO: feedback on successful update
                 this.finish();
                 break;
+            case (R.id.input_date):
+                DatePickerDialog mDatePicker;
+                mDatePicker = new DatePickerDialog(PatientInfoActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
+                        selectedmonth = selectedmonth + 1;
+                        mEditDate.setText("" + selectedday + "/" + selectedmonth + "/" + selectedyear);
+                    }
+                }, 1970, 1, 1);
+                mDatePicker.setTitle("Select Date");
+                mDatePicker.show();
+                break;
         }
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("PatientInfo Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 }

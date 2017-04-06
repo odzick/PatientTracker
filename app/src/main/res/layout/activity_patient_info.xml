@@ -16,7 +16,8 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/confirm_fab">
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_layout_name"
@@ -29,6 +30,20 @@
                 android:layout_height="wrap_content"
                 android:maxLines="1"
                 android:hint="Patient Name" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/input_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:hint="Date of Birth"
+                android:focusable="false"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -63,6 +78,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_layout_city"
