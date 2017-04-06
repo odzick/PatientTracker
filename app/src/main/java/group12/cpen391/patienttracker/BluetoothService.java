@@ -3,52 +3,67 @@ package group12.cpen391.patienttracker;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.icu.util.Output;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
-import static android.support.v4.app.ActivityCompat.startActivityForResult;
-import static java.security.AccessController.getContext;
-
 public class BluetoothService {
-    private static BluetoothService bt = new BluetoothService();
+    private static BluetoothService mBluetoothService;
     private final BluetoothAdapter mBluetoothAdapter;
     private BluetoothDevice mDevice;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private boolean isRunning;
+    private boolean devicePaired;
+
+    private final String TAG = "Bluetooth";
+    private final String BT_ERR_NO_DEVICES = "No Bluetooth devices to pair with.";
+    private final String BT_ERR_ON_CONNECT = "Error connecting to Bluetooth socket.";
+    private final String BT_SUCCESS = "Successfully connected to Bluetooth device";
+
 
     public BluetoothService() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mDevice = null;
         mConnectThread = null;
         mConnectedThread = null;
-        isRunning = false;
+        devicePaired = false;
     }
 
     public static BluetoothService getService() {
-        return bt;
+        if (mBluetoothService == null) {mBluetoothService = new BluetoothService();}
+        return mBluetoothService;
+    }
+
+    public boolean isEnabled() {
+        return mBluetoothAdapter.isEnabled();
+    }
+
+    public boolean devicePaired() {
+        return devicePaired;
+    }
+
+    public String getDeviceName(){
+        if (mDevice == null) return "N/A";
+        return mDevice.getName();
+    }
+
+    public String getDeviceMac() {
+        if (mDevice == null) return "N/A";
+        return mDevice.getAddress();
     }
 
     public synchronized void connect() {
-        // TODO: Check if bluetooth enabled and redirect to bluetooth intent page.
-        // if (!mBluetoothAdapter.isEnabled()) {
-        //   Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-        //   startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        // }
-        isRunning = false;
+        devicePaired = false;
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
         if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
 
-        mDevice = null;
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        Log.v("Bluetooth", "pairedDevices.size() = " + pairedDevices.size());
+        Log.v(TAG, "connect(): pairedDevices.size() = " + pairedDevices.size());
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
@@ -62,25 +77,41 @@ public class BluetoothService {
             mConnectThread = new ConnectThread(mDevice);
             mConnectThread.start();
         } else {
-
+            showToast(BT_ERR_NO_DEVICES);
         }
     }
 
     public synchronized void close() {
-        Log.v("Bluetooth", "stopping BT threads");
-        isRunning = false;
+        Log.v(TAG, "close(): stopping BT threads");
+        mDevice = null;
+        devicePaired = false;
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
         if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
+        updateUI(devicePaired);
     }
 
     public synchronized void write(String data){
-        if (!isRunning){
-            // TODO: replace with error toast
-            Log.v("Bluetooth", "Failed write: Not connected to Bluetooth device");
+        if (!devicePaired){
+            Log.v(TAG, "Failed write: Not connected to Bluetooth device");
+            return;
         }
         data = "|" + data + "|";
-        Log.v("Bluetooth", "Writing to DE1: " + data);
+        Log.v(TAG, "Writing to DE1: " + data);
         mConnectedThread.write(data.getBytes());
+    }
+
+    private void showToast(String message) {
+        Handler h = BluetoothActivity.getHandler();
+        Message msg = h.obtainMessage(BluetoothActivity.SHOW_TOAST);
+        msg.obj = message;
+        h.sendMessage(msg);
+    }
+
+    private void updateUI(boolean devicePaired) {
+        Handler h = BluetoothActivity.getHandler();
+        Message msg = h.obtainMessage(BluetoothActivity.UPDATE_UI);
+        msg.obj = devicePaired;
+        h.sendMessage(msg);
     }
 
     private class ConnectThread extends Thread {
@@ -90,7 +121,9 @@ public class BluetoothService {
         public ConnectThread(BluetoothDevice device) {
             try {
                 mmSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                Log.e(TAG, "Exception creating BT socket", e);
+            }
         }
 
         public void run() {
@@ -101,10 +134,13 @@ public class BluetoothService {
                 // Connect to the remote device through the socket.
                 mmSocket.connect();
             } catch (IOException connectException) {
-                Log.e("Bluetooth", "Error connecting to bluetooth socket", connectException);
+                Log.e(TAG, "Exception connecting to bluetooth socket", connectException);
+                showToast(BT_ERR_ON_CONNECT);
                 try {
                     mmSocket.close();
-                } catch (IOException closeException) { }
+                } catch (IOException closeException) {
+                    Log.e(TAG, "Exception closing BT socket", closeException);
+                }
                 return;
             }
             mConnectedThread = new ConnectedThread(mmSocket);
@@ -114,9 +150,12 @@ public class BluetoothService {
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                Log.e(TAG, "Exception closing BT socket", e);
+            }
         }
     }
+
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
@@ -128,21 +167,23 @@ public class BluetoothService {
             try {
                 tmpOut = socket.getOutputStream();
             } catch (IOException e) {
+                Log.e(TAG, "Exception opening OutputStream on BT socket", e);
             }
             mmOutStream = tmpOut;
         }
 
         public void run() {
-            isRunning = true;
-            Log.v("Bluetooth", "ConnectedThread created. isRunning = " + isRunning);
-            while (!Thread.currentThread().isInterrupted()) {
-            }
+            showToast(BT_SUCCESS);
+            devicePaired = true;
+            updateUI(devicePaired);
+            while (!Thread.currentThread().isInterrupted()) { }
         }
 
         public void write(byte[] bytes) {
             try {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
+                Log.e(TAG, "Exception writing to OutputStream", e);
             }
         }
 
@@ -150,6 +191,7 @@ public class BluetoothService {
             try {
                 mmSocket.close();
             } catch (IOException e) {
+                Log.e(TAG, "Exception closing BT socket", e);
             }
             interrupt();
         }

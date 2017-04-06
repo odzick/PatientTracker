@@ -1,9 +1,19 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gallery_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="group12.cpen391.patienttracker.GalleryFragment">
 
-
-
-</RelativeLayout>
+    <GridView
+        android:id="@+id/gallery_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:layout_margin="10dp"
+        android:stretchMode="columnWidth"
+        android:drawSelectorOnTop="true"
+        android:clickable="true"
+        android:numColumns="2" />
+</FrameLayout>
