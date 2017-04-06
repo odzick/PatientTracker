@@ -63,9 +63,9 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
     static final int REQUEST_IMAGE_CROP = 3;
 
     private View rootView;
-    private Button mChangeInfoButton;
-    private Button mChangePhotoButton;
-    private Button mChangeContactButton;
+    private static Button mChangeInfoButton;
+    private static Button mChangePhotoButton;
+    private static Button mChangeContactButton;
     private Button mPairDeviceButton;
 
     public SettingsFragment() {
@@ -110,11 +110,12 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
             mChangeContactButton = (Button) rootView.findViewById(R.id.contacts_button);
             mChangePhotoButton = (Button) rootView.findViewById(R.id.change_photo_button);
 
+            updateBluetoothButtons(BluetoothService.getService().devicePaired());
+
             mChangeInfoButton.setOnClickListener(this);
             mPairDeviceButton.setOnClickListener(this);
             mChangeContactButton.setOnClickListener(this);
             mChangePhotoButton.setOnClickListener(this);
-
         } catch (InflateException e){
         Log.e("settingsview", "Inflate exception");
         }
@@ -247,5 +248,11 @@ public class SettingsFragment extends Fragment implements AdapterView.OnClickLis
             Toast toast = Toast.makeText(this.getContext(), errorMessage, Toast.LENGTH_SHORT);
             toast.show();
         }
+    }
+
+    public static void updateBluetoothButtons(boolean devicePaired){
+        mChangeInfoButton.setEnabled(devicePaired);
+        mChangeContactButton.setEnabled(devicePaired);
+        mChangePhotoButton.setEnabled(devicePaired);
     }
 }

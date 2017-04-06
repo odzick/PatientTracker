@@ -3,13 +3,14 @@ package group12.cpen391.patienttracker;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Handler;
 
 public class BluetoothService {
     private static BluetoothService mBluetoothService;
@@ -76,7 +77,7 @@ public class BluetoothService {
             mConnectThread = new ConnectThread(mDevice);
             mConnectThread.start();
         } else {
-            BluetoothActivity.showReponseToast(BT_ERR_NO_DEVICES);
+            showToast(BT_ERR_NO_DEVICES);
         }
     }
 
@@ -86,17 +87,31 @@ public class BluetoothService {
         devicePaired = false;
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
         if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
-        BluetoothActivity.updateSwitchState(devicePaired);
+        updateUI(devicePaired);
     }
 
     public synchronized void write(String data){
         if (!devicePaired){
-            // TODO: replace with error toast (pass context?)
             Log.v(TAG, "Failed write: Not connected to Bluetooth device");
+            return;
         }
         data = "|" + data + "|";
         Log.v(TAG, "Writing to DE1: " + data);
         mConnectedThread.write(data.getBytes());
+    }
+
+    private void showToast(String message) {
+        Handler h = BluetoothActivity.getHandler();
+        Message msg = h.obtainMessage(BluetoothActivity.SHOW_TOAST);
+        msg.obj = message;
+        h.sendMessage(msg);
+    }
+
+    private void updateUI(boolean devicePaired) {
+        Handler h = BluetoothActivity.getHandler();
+        Message msg = h.obtainMessage(BluetoothActivity.UPDATE_UI);
+        msg.obj = devicePaired;
+        h.sendMessage(msg);
     }
 
     private class ConnectThread extends Thread {
@@ -120,7 +135,7 @@ public class BluetoothService {
                 mmSocket.connect();
             } catch (IOException connectException) {
                 Log.e(TAG, "Exception connecting to bluetooth socket", connectException);
-                BluetoothActivity.showReponseToast(BT_ERR_ON_CONNECT);
+                showToast(BT_ERR_ON_CONNECT);
                 try {
                     mmSocket.close();
                 } catch (IOException closeException) {
@@ -158,9 +173,9 @@ public class BluetoothService {
         }
 
         public void run() {
+            showToast(BT_SUCCESS);
             devicePaired = true;
-            BluetoothActivity.updateSwitchState(devicePaired);
-            BluetoothActivity.showReponseToast(BT_SUCCESS);
+            updateUI(devicePaired);
             while (!Thread.currentThread().isInterrupted()) { }
         }
 
