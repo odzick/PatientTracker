@@ -56,7 +56,10 @@ public class BluetoothActivity extends AppCompatActivity {
         mPairSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                mPairSwitch.setChecked(false); // Default to off and let connection logic update switch state
+                // De-register listener to avoid calling itself
+//                mPairSwitch.setOnCheckedChangeListener(null);
+//                mPairSwitch.setChecked(false); // Default to off and let connection logic update switch state
+//                mPairSwitch.setOnCheckedChangeListener(this);
                 if (bChecked && !bt.isEnabled()) {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivity(enableBtIntent);
