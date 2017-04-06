@@ -22,7 +22,6 @@ import java.util.Date;
 public class GalleryFragment extends Fragment {
 
     private GridView mGridView;
-    public static ArrayList<ImageItem> imageList = new ArrayList<>();
     private static GalleryAdapter mAdapter;
 
     private View rootView;
@@ -76,9 +75,7 @@ public class GalleryFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
         mGridView = (GridView) rootView.findViewById(R.id.gallery_gridview);
 
-        // Populate imageList array/get images
-
-        mAdapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout, imageList);
+        mAdapter = new GalleryAdapter(getActivity(), R.layout.grid_item_layout);
         mGridView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
 
@@ -88,11 +85,7 @@ public class GalleryFragment extends Fragment {
                     ImageItem item = (ImageItem) parent.getItemAtPosition(position);
                     Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
 
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    Bitmap image = item.image;
-                    image.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    intent.putExtra("image", byteArray);
+                    intent.putExtra("filename", item.filename);
                     startActivity(intent);
                 }
             });

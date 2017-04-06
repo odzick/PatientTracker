@@ -34,6 +34,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,9 +44,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static group12.cpen391.patienttracker.GalleryFragment.imageList;
 import static group12.cpen391.patienttracker.serverMessageParsing.Translator.parseGPS;
 
 
@@ -368,8 +370,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
     */
                             Bitmap image = BitmapFactory.decodeStream(inStream);
                             if (image != null) {
-                                Log.v("GALLERY", "image output: " + image);
-                                gallery.addItem(new ImageItem(id, date, image));
+                                Random rand = new Random();
+                                // Assign filename Image-<id>-<random number>.jpg to avoid duplicates
+                                String filename =
+                                        "Image-" + id + "-" + rand.nextInt(10000) + ".jpg";
+                                File f = new File(getContext().getFilesDir(), filename);
+                                if (f.exists()){
+                                    f.delete();
+                                }
+                                try {
+                                    FileOutputStream os = new FileOutputStream(f);
+                                    image.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                                    os.flush();
+                                    os.close();
+                                    gallery.addItem(new ImageItem(id, date, filename));
+                                    Log.v("GALLERY", "Saved image to filesystem: " + filename);
+                                } catch (Exception e){
+                                    Log.e("GALLERY", e.toString());
+                                }
                             } else {
                                 Log.v("GALLERY", "Image was null, not saved");
                             }
@@ -459,6 +477,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
             if (pathPoints.size() != 0) {
                 patientMarker.setPosition(pathPoints.get(pathPoints.size() - 1));
             }
+            GalleryFragment.getAdapter().updateJsonMetadata();
             GalleryFragment.getAdapter().notifyDataSetChanged();
         }
     }

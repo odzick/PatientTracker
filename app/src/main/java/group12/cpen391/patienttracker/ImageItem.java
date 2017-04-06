@@ -1,6 +1,5 @@
 package group12.cpen391.patienttracker;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import java.text.ParseException;
@@ -10,12 +9,12 @@ import java.util.Date;
 public class ImageItem {
     public int id;
     public String date;
-    public Bitmap image;
+    public String filename;
 
-    public ImageItem(int id, String date, Bitmap image){
+    public ImageItem(int id, String date, String filename){
         this.id = id;
         this.date = formatDate(date);
-        this.image = image;
+        this.filename = filename;
     }
 
     private String formatDate(String date){
