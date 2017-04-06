@@ -350,7 +350,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Adapter
                     inStream.read(b, 0, 256);
 
                     s = new String(b);
-                    if(s.contains("OK")){
+                    if(!(parts[0].contentEquals("EMPTY") && s.contains("OK"))){
                         int id = Integer.parseInt(parts[0]);
                         String date = parts[2];
 
